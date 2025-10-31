@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   timescaledb:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb:latest-pg16  # Make sure this line is here
     container_name: timescaledb
     environment:
       POSTGRES_PASSWORD: Aromal@8338
