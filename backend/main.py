@@ -73,7 +73,7 @@ def on_message(client, userdata, msg):
                     bus_data[vehicle_id] = data
 
                 # Storing in combined view as well
-                all_vehicles = data
+                all_vehicles[vehicle_id] = data  # Adds/updates the vehicle in the dict
 
                 # Storing history (Keeping the last 100 points per vehicle)
                 if vehicle_id not in vehicle_history:
@@ -86,6 +86,13 @@ def on_message(client, userdata, msg):
                     vehicle_history[vehicle_id] = vehicle_history[vehicle_id][-100:]
                 
                 # Broadcasting to websocket client
+
+                #Log for debugging
+                vehicle_emoji = "🚇" if vehicle_type == "METRO" else "🚌"
+                status = data.get("status", "UNKNOWN")
+                location = data.get("current_stop", data.get("next_stop", "UNKNOWN"))
+
+                print(f"{vehicle_emoji} {vehicle_id[:25]:25} | {status:8} | {location[:30]:30}")
 
     except Exception as e:
         print(f"❌ Error processing message: {e}")
@@ -238,7 +245,7 @@ def get_routes():
         if not route_id:
             continue
 
-        routes_dict = metro_routes if vehicle_type == "METRO"
+        routes_dict = metro_routes if vehicle_type == "METRO" else bus_routes
 
         if route_id not in routes_dict:
             routes_dict[route_id] = {
@@ -341,6 +348,7 @@ def shutdown_event():
     mqtt_client.loop_stop()
     mqtt_client.disconnect()
     print("🛑 MQTT client disconnected")
+
 
 if __name__ == "__main__":
     import uvicorn
