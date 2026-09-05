@@ -37,9 +37,9 @@ export default function StatsPanel({ stats, loading }: StatsPanelProps) {
                 color="bg-green-500"
             />
 
-            {/* Metro stats */}
+            {/* Metro stats - FIXED ICON */}
             <StatCard 
-                icon={<Bus className="w-6 h-6" />}
+                icon={<Train className="w-6 h-6" />}
                 title="Metros"
                 value={stats.metros.total}
                 subtitle={`${stats.metros.passengers} passengers`}
@@ -48,7 +48,7 @@ export default function StatsPanel({ stats, loading }: StatsPanelProps) {
 
             {/* Total Passengers */}
             <StatCard 
-                icon={<Bus className="w-6 h-6" />}
+                icon={<Users className="w-6 h-6" />}
                 title="Total Passengers"
                 value={stats.buses.passengers + stats.metros.passengers}
                 subtitle={`Avg: ${Math.round((stats.buses.avg_occupancy_percent + stats.metros.avg_occupancy_percent) / 2)}% full`}
@@ -71,7 +71,7 @@ interface StatCardProps {
 
 function StatCard({ icon, title, value, subtitle, color }: StatCardProps) {
     return (
-        <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+        <div className="bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-700">
             <div className="flex item-center justify-between mb-2">
                 <div className={`${color} p-2 rounded-lg text-white`}>
                     {icon}

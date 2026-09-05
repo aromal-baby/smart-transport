@@ -140,8 +140,16 @@ class MultiBusSimulator:
                     )
                     
                     avg_speed = self.get_speed_for_time()
+
+                    # Check if next stop is a via point (no dwell time)
+                    is_via_point = next_stop.get("is_via_point", False)
+
+                    # Adjust travel time based on distance
                     travel_time_seconds = (distance / avg_speed) * 3600
-                    num_updates = max(3, int(travel_time_seconds / 5))
+
+                    # More frequent updates for smoother movement (every 2-5 seconds)
+                    update_interval = 3 # Seconds b/w updates
+                    num_updates = max(3, int(travel_time_seconds / update_interval))
                     
                     for i in range(num_updates):
                         if not self.running:
@@ -155,7 +163,7 @@ class MultiBusSimulator:
                         lat += random.uniform(-noise, noise)
                         lon += random.uniform(-noise, noise)
                         
-                        current_speed = avg_speed * random.uniform(0.8, 1.2)
+                        current_speed = avg_speed * random.uniform(0.85, 1.15)
                         occupancy_percent = round((self.passengers / capacity) * 100, 1)
                         
                         data = {
@@ -179,7 +187,12 @@ class MultiBusSimulator:
                         time.sleep(travel_time_seconds / num_updates)
                     
                     self.current_stop_index = next_stop_index
-                    self.is_at_stop = True
+
+                    # Only stopping at real stops, not via points
+                    if is_via_point:
+                        self.is_at_stop = False     # Keep moving through via points
+                    else:
+                        self.is_at_stop = True
                     
             except Exception as e:
                 print(f"❌ {self.bus_id} error: {e}")
@@ -189,7 +202,8 @@ class MultiBusSimulator:
     
     def publish_data(self, data):
         """Publishing to MQTT"""
-        topic = f"transport/bus/{self.bus_id}/data"
+        vehicle_topic = "metro" if self.vehicle_type == "METRO" else "bus"
+        topic = f"transport/{vehicle_topic}/{self.bus_id}/data"
         self.client.publish(topic, json.dumps(data))
     
     def stop(self):
